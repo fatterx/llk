@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+		<title>植物大战僵尸--连连看</title>
+		<link href="css/common.css" type="text/css" rel="stylesheet">
+	</head>
+	<body>
+		<div class="container">
+			<div id="llk_wrap">
+				<audio src="images/bg.ogg" preload="preload" loop="loop" id="music"></audio>
+				<div id="llk_map">
+					<canvas width="600" height="480" id="canvas">Oops! Your Browser Cannot Support HTML5!</canvas>
+				</div>
+				<div id="llk_tools">
+					<div class="tools-item">
+						<span>提示:</span>
+						<img alt="hint" src="images/hint.png" id="hint_button"/>
+						<span id="hint_text">*3</span>
+					</div>
+					<div class="tools-item">
+						<span>重排:</span>
+						<img alt="disorder" src="images/disorder.png" id="disorder_button"/>
+						<span id="disorder_text">*3</span>
+					</div>
+					<div class="tools-item">
+						<span>音乐:</span>
+						<img alt="music" src="images/sound-on.png" id="music_button"/>
+					</div>
+				</div>
+				<img alt="开始" src="images/start.png" id="start_button"/>
+				<div id="llk_progressbar">
+					<div id="progress_content">
+						<img id="progress_empty" src="images/FlagMeterEmpty.png"/>
+						<img id="progress_full" src="images/FlagMeterFull.png" />
+						<img id="progress_head" src="images/FlagMeterParts1.png"/>
+					</div>
+				</div>
+				<img src="images/zombiesWon.png" id="won"/>
+			</div>
+		</div>
+		<script src="js/llk.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			LLK();
+		</script>
+	</body>
+</html>
