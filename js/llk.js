@@ -2,8 +2,11 @@
  *	author:fatter;
  *	E-mail:lwn888@gmail.com
  *	Date:2011.12.23
- *	Update:2012.8.29
- *
+ *	Update:2012.8.30
+ *	
+ *	2012.8.30 22:00 增加了动画
+ *	2012.8.30 15:00 增加了cookie操作，用来保存用户记录
+ *	2012.8.30 10:00 增加了资源加载界面
  */
 
 		var $ = function(id){
@@ -66,9 +69,11 @@
 				player = this.getCookie("name");
 				records = this.getCookie("records");
 				player &&  (player$.innerHTML = player);
-				records && (records$.innerHTML = records);
+				records && (records$.innerHTML = Math.floor(records/4));
 				loading$.style.display = "none";
-				llk_wrap$.style.display = "block";	
+//				this.fadeOut(loading$);
+				this.fadeIn(llk_wrap$);
+				//llk_wrap$.style.display = "block";	
 
 			},
 			loadImg:function(queue){
@@ -448,7 +453,8 @@
 					hintBtn$ = $("hint_button"),
 					disorderBtn$ = $("disorder_button"),
 					progressHead$ = $("progress_head"),
-					progressFull$ = $("progress_full");
+					progressFull$ = $("progress_full"),
+					submitBtn$ = $("submit_button");
 
 				addEventListener(canvas$,"click",function(e){
 					var e = e || window.event,
@@ -546,10 +552,11 @@
 					won$.style.display = "none";
 					self.creatMap().disorder();
 					self.drawMap();
+					progressFull$.style.visibility = "hidden";
 					t = setInterval(function(){
 							var posX = --leftTime;
-
 							progressFull$.style.clip = "rect(0,270px,35px,"+posX+"px)";
+							progressFull$.style.visibility = "visible";
 							progressHead$.style.left = (posX-5) + "px";
 							if(leftTime === 0){
 								self.gameover();
@@ -591,6 +598,21 @@
 						}
 				},false);
 
+				addEventListener(submitBtn$,"click",function(){
+					var name = $("name_text").value,
+						player$ = $("player_name"),
+						dialog = $("dialog"),
+						mask$ = $("mask");
+
+					if(name.length > 6){
+						name = name.substr(0,6);
+					}
+					self.setCookie("name",name);
+					player$.innerHTML = name;
+					dialog.style.display = "none";
+					mask.style.display = "none";
+				});
+
 				addEventListener(document,"click",function(e){	//上帝模式
 						if(!self.isGameBegin){
 							return;
@@ -617,7 +639,7 @@
 							self.success();
 						}
 
-						if(e.ctrlKey && e.shiftKey && e.keyCode === 68){
+						if(e.ctrlKey && e.shiftKey && e.keyCode === 75){
 							self.gameover();
 						}
 
@@ -645,7 +667,7 @@
 
 				startBtn$.style.display = "block";
 				won$.src = "images/zombieNote.png";
-				won$.style.display = "block";
+				this.animate(won$);	
 				this.isGameBegin = false;
 				this.ctx.clearRect(0,0,600,480);
 				this.ctx.save();
@@ -655,24 +677,26 @@
 				if(this.imgsType < 18){
 					this.imgsType++;
 				}
-		//		if(++(this.records)%4 === 0){
+				if(++(this.records)%4 === 0){
 					won.src = "images/trophy.png";
-					records$.innerHTML = ++this.records;
-					this.setCookie("records",this.records);
-		//			alert("恭喜你赢得一个奖杯！");
-		//		}
+					this.animate(won$);
+				}
+				records$.innerHTML = Math.floor(this.records/4);
+				this.setCookie("records",this.records);
 				this.init();
 			},
 			gameover:function(){
 				var startBtn$ = $("start_button"),
 					won$ = $("won"),
-					player$ = $("player_name"),
+					dialog$ = $("dialog"),
+					mask$ = $("mask"),
 					records$ = $("player_records"),
 					name;
 
 				startBtn$.style.display = "block";
 				won$.src = "images/zombiesWon.png";
-				won$.style.display = "block";
+				//won$.style.display = "block";
+				this.animate(won$);
 				this.isGameBegin = false;
 				this.ctx.clearRect(0,0,600,480);
 				this.ctx.save();
@@ -680,15 +704,11 @@
 				clearInterval(t);
 				
 				if(this.getCookie("name") === null){
-					name = prompt("请输入您的昵称","playerA");
-					if(name.length > 6){
-						name = name.substr(0,6);
-					}
-					this.setCookie("name",name);
-					player$.innerHTML = name;
+					this.fadeIn(dialog$);
+					mask$.style.display = "block";
 				} 
-				this.setCookie("records",this.records);
-				records$.innerHTML = this.records;
+				this.setCookie("records",0);
+				records$.innerHTML = 0;
 			},
 			toggleInterface:function(){
 				var	wrap$ = $("llk_wrap"),
@@ -731,5 +751,131 @@
 					return ret[1];
 				}
 				return null;
+			},
+			getStyle:function(elem,name){
+				if(elem.style[name]){
+					return elem.style[name];
+				} else if(elem.currentStyle){
+					return elem.currentStyle[name];
+				} else if(document.defaultView && document.defaultView.getComputedStyle){
+					var s = document.defaultView.getComputedStyle(elem,"");
+
+					name = name.replace(/[A-Z]/g,"-$1");
+					name = name.toLowerCase();
+					return s && s.getPropertyValue(name);
+				} else {
+					return null;
+				}
+			},
+			getWidth:function(elem){
+				return parseInt(this.getStyle(elem,"width"));
+			},
+			getHeight:function(elem){
+				return parseInt(this.getStyle(elem,"height"));
+			},
+			getTrueWidth:function(elem){
+				if(elem.style.display != "none"){
+					return elem.offsetWidth || this.getWidth(elem);
+				}
+				var old,ret;
+			
+				old = this.resetCSS(elem,{
+					visibility:"hidden",
+					position:"absolute",
+					display:"block"
+				});
+
+				ret = elem.offsetWidth || this.getWidth(elem);
+				this.restoreCSS(elem,old);
+				return ret;
+			},
+			getTrueHeight:function(elem){
+				if(elem.style.display != "none"){
+					return elem.offsetHeight || this.getHeight(elem);
+				}
+				var old,ret;
+			
+				old = this.resetCSS(elem,{
+					visibility:"hidden",
+					position:"absolute",
+					display:"block"
+				});
+				ret = elem.offsetHeight || this.getHeight(elem);
+				this.restoreCSS(elem,old);
+				return ret;
+			},
+			resetCSS:function(elem,prop){
+				var old = {}, i;
+				
+				for(i in prop){
+					old[i] = elem.style[i];
+					elem.style[i] = prop[i];
+				}
+
+				return old;
+			},
+			restoreCSS:function(elem,prop){
+				for(var i in prop){
+					elem.style[i] = prop[i];
+				}
+			},
+			setOpacity:function(elem,level){
+				if(elem.filters){
+					elem.style.filters = "alpha(opacity=" + level + ")";
+				} else {
+					elem.style.opacity = level / 100;
+				}
+			},
+			fadeIn:function(elem,time){
+				var time = time || 10,
+					i = 0,
+					self = this;
+
+				this.setOpacity(elem,0);
+				elem.style.display = "block";
+				for(; i<=100; i+=5){
+					(function(idx){
+						setTimeout(function(){
+							self.setOpacity(elem,idx);
+						},(idx+1)*time);
+					})(i);
+				}
+			},
+			fadeOut:function(elem,time){
+				var time = time || 10,
+					i = 0,
+					self = this;
+
+				for(; i<=100; i+=5){
+					(function(idx){
+						setTimeout(function(){
+							self.setOpacity(elem,100-idx);
+							if(idx === 100){
+								elem.style.display = "none";
+							}
+						},(idx+1)*time);
+					})(i);
+				}
+			},
+			animate:function(elem,time){
+				var time = time || 10,
+					i = 0,
+					self = this,
+					left = self.getStyle(elem,"left"),
+					top = self.getStyle(elem,"top"),
+					width = self.getTrueWidth(elem),
+					height = self.getTrueHeight(elem);
+
+				elem.style.display = "block";
+				for(; i<=100; i+=5){
+					(function(idx){
+						setTimeout(function(){
+							elem.style.left =  (idx / 100 * left) + "px";
+							elem.style.top = idx / 100 * top + "px";
+							elem.style.width = idx / 100 * width + "px";
+							elem.style.height = idx / 100 * height + "px";
+						},(idx+1)*time);
+					})(i);
+				}
 			}
 		}

@@ -7,7 +7,7 @@
 	</head>
 	<body>
 		<div class="container">
-			<div id="loading">游戏资源加载中，请稍后...<span id="percentage"></span></div>
+			<div id="loading">游戏资源加载中，请稍后...<span id="percentage">0%</span></div>
 			<div id="llk_wrap">
 				<audio src="images/bg.ogg" preload="preload" loop="loop" id="music"></audio>
 				<div id="llk_map">
@@ -43,6 +43,15 @@
 					<span id="player_records">0</span>&nbsp;个奖杯
 				</div>
 			</div>
+			<div id="dialog">
+				<div id="dialog_head">请先输入您的昵称</div>
+				<div id="dialog_body">
+					<label for="name_text" >昵称：</label>
+					<input type="text" maxLength="6" value="player" id="name_text"/>
+					<input type="submit" value="确认" id="submit_button"/>
+				</div>
+			</div>
+			<div id="mask"></div>
 		</div>
 		<script src="js/llk.js" type="text/javascript"></script>
 		<script type="text/javascript">
