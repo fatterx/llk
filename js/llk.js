@@ -10,45 +10,101 @@
 				return document.getElementById(id);
 			},
 
+			addEventListener = function(elem,type,handler){
+				if(elem.nodeType && (elem.nodeType === 1 || elem.nodeType === 9)){
+					if(elem.addEventListener){
+						elem.addEventListener(type,handler,false);
+					} else if(elem.attachEvent){
+						elem.attachEvent("on"+type,handler);
+					} else {
+						elem["on"+type] = handler;
+					}
+				}
+			},
+
 			LLK = function(){
 				if(!(this instanceof arguments.callee)){
 					return new LLK();
 				}
 				this.map_width = 10;
 				this.map_height = 8;
-				this.imgsType = 18;
-				this.init();
+				this.imgsType = 10;
+				this.records = 0;
+				this.loading();
 			},
 			
 			t;
 
 		LLK.prototype = {
+			loading:function(){
+				var	imgQueue = ['pvz.png','background.jpg','background1.jpg','toolsBackground.png','zombieNote.png','zombiesWon.png','recordsBackground.png','trophy.png'];
+					this.loadImg(imgQueue);
+					this.checkLoaded();
+			},
 			init:function(){
-					var canvas = $("canvas"),
-						ctx = canvas.getContext("2d");
-						
-					this.mapArray=[];
-					this.points = [];
-					this.isGameBegin=false;
-					this.timeLimit = 250;
-					this.hintTimes = 3;
-					this.disorderTimes = 3;
-					this.lastX=null;
-					this.lastY=null;
-					this.leftPairs = (this.map_height * this.map_width) /2;
-					this.ctx = ctx;
-					!this.eventBound && this.eventBind();
+				var llk_wrap$ = $("llk_wrap"),
+					loading$ = $("loading"),
+					canvas$ = $("canvas"),
+					ctx = canvas$.getContext("2d"),
+					player$ = $("player_name"),
+					records$ = $("player_records"),
+					player, records;
+				
+				this.mapArray=[];
+				this.points = [];
+				this.isGameBegin=false;
+				this.timeLimit = 250;
+				this.hintTimes = 3;
+				this.disorderTimes = 3;
+				this.lastX=null;
+				this.lastY=null;
+				this.leftPairs = (this.map_height * this.map_width) /2;
+				this.ctx = ctx;
+				this.isGod = false;
+				!this.eventBound && this.eventBind();
+				
+				player = this.getCookie("name");
+				records = this.getCookie("records");
+				player &&  (player$.innerHTML = player);
+				records && (records$.innerHTML = records);
+				loading$.style.display = "none";
+				llk_wrap$.style.display = "block";	
 
-				 },
-			loadImg:function(){
-				var img  = new Image(),
-					self = this;
-
-				img.src = "images\/pvz.png";
-				img.onload = function(){
-					self.imgLoad = true;
+			},
+			loadImg:function(queue){
+				var img = new Image(),
+					self = this,
+					percentage$ = $("percentage"),
+					src, percentage;
+		
+				if(queue.length > 0){
+					src = queue.shift();
+					if(src === "pvz.png"){
+						this.img = img;
+					}
+					img.src = "images/"+src;
+					img.onload = function(){
+						percentage = (8 - queue.length) / 8 * 100;
+						percentage$.innerHTML = percentage + "%";
+						if(queue.length > 0){
+							self.loadImg(queue);
+						} else {
+							self.isLoaded = true;
+							return true;
+						}
+					}
 				}
-				this.img = img;
+			},
+			checkLoaded:function(){
+				var self = this;
+				
+				if(!self.isLoaded){
+					setTimeout(function(){
+						self.checkLoaded();
+					},30);
+				} else {
+					self.init();
+				}
 			},
 			creatMap:function(){
 				var k =1;
@@ -154,8 +210,6 @@
 					return false;
 				}
 	
-				//x1>x2 && (x1=x1+x2, x2=x1-x2, x1=x1-x2, y1=y1+y2, y2=y1-y2, y1=y1-y2); //强制x1在左边
-				
 				if(x1 === x2){		//同列
 					if(1 === y1-y2 || 1 === y2-y1){	//相邻
 						this.addPoints([x1,y1],[x2,y2]);
@@ -292,62 +346,6 @@
 					}
 				}
 
-				//广度优先搜索
-				/*
-				var crossNum = 0,
-					s = [],
-					tmp = [],
-					indexOf = String.prototype.indexOf,
-					sVal = this.mapArray[y2][x2],
-					self = this,
-
-					findAdj = function (x,y){
-						var ret = [],val = 0;
-	
-						if(x+1 < self.map_width && (val = self.mapArray[y][x+1]) > 0){
-							ret.push([x+1,y,val]);
-						}
-						if(x-1 > 0  && (val = self.mapArray[y][x-1]) > 0){
-							ret.push([x-1,y,val]);
-						}
-						if(y+1 < self.map_height && (val = self.mapArray[y+1][x+1]) > 0){
-							ret.push([x,y+1,val]);
-						}
-						if(y-1 > 0 &&  (val = self.mapArray[y-1][x1]) > 0){
-							ret.push([x,y-1,val]);
-						}
-						return ret;
-				},
-				
-				concat = function(s,d){
-					var i = 0, len = d.length;
-					if(d === void 0){
-						return;
-					}
-					for(; i < len; ++i){
-						s.push(d[i]);
-					}
-
-					return s;
-				},
-				adjs = findAdj(x1,y1);
-				//s.concat(adjs); //s为空？bug？
-				concat(s,adjs);	
-				while(indexOf.call(s,[x2,y2,sVal]) < 0 && crossNum < 3){
-
-					for(var i=0, l=s.length; i<l; i++){
-						var adjs = findAdj(s[i][0],s[i][1]);
-						concat(tmp,adjs);
-					}
-					concat(s,tmp);
-					tmp  = [];
-					crossNum++;
-				}
-
-				if(indexOf.call(s,[x2,y2,sVal]) >=0 ){
-					return true;
-				}
-*/
 				return false;
 			},
 			
@@ -442,18 +440,19 @@
 			},
 			eventBind:function(){
 				var self = this,
-					canvas = $("canvas"),
+					canvas$ = $("canvas"),
 					getImgPos = this.getImgPos,
-					audio = $("music"),
-					musicBtn = $("music_button"),
-					startBtn = $("start_button"),
-					hintBtn = $("hint_button"),
-					disorderBtn = $("disorder_button"),
-					progressHead = $("progress_head"),
-					progressFull = $("progress_full");
+					audio$ = $("music"),
+					musicBtn$ = $("music_button"),
+					startBtn$ = $("start_button"),
+					hintBtn$ = $("hint_button"),
+					disorderBtn$ = $("disorder_button"),
+					progressHead$ = $("progress_head"),
+					progressFull$ = $("progress_full");
 
-				canvas.addEventListener("click",function(e){
-					var pos = getImgPos.apply(self,arguments),	//得到点击的图片坐标
+				addEventListener(canvas$,"click",function(e){
+					var e = e || window.event,
+						pos = getImgPos.apply(self,arguments),	//得到点击的图片坐标
 						x = pos && pos.x || 0,
 						y = pos && pos.y || 0,
 						lastX = self.lastX,
@@ -471,8 +470,8 @@
 							self.drawMap();
 							return;
 						}
-						if(mapArray[y][x] === mapArray[lastY][lastX]){
-							if(self.canCleanup(x,y,lastX,lastY)){	//判断是否能够连通
+						if(self.isGod || mapArray[y][x] === mapArray[lastY][lastX]){
+							if(self.isGod || self.canCleanup(x,y,lastX,lastY)){	//判断是否能够连通
 								self.drawLine();	
 								setTimeout(function(){
 									self.clearImg(x,y);
@@ -483,7 +482,7 @@
 									if(!self.leftPairs){
 										self.success();
 									}
-									self.isDead() && self.autoDisorder(); 
+									self.isGod || (self.isDead() && self.autoDisorder()); 
 
 								},100);
 							} else {
@@ -500,8 +499,9 @@
 					self.lastY = y;
 				},false);
 
-				canvas.addEventListener("mousemove",function(e){
-					var pos = getImgPos.apply(self,arguments),	//得到点击的图片坐标
+				addEventListener(canvas$,"mousemove",function(e){
+					var e = e || window.event,
+						pos = getImgPos.apply(self,arguments),	//得到点击的图片坐标
 						x = pos && pos.x || 0,
 						y = pos && pos.y || 0;
 
@@ -513,58 +513,54 @@
 					}
 
 					if(!self.mapArray[y][x]){
-						canvas.style.cursor = "default";
+						canvas$.style.cursor = "default";
 					} else {
-						canvas.style.cursor = "pointer";
+						canvas$.style.cursor = "pointer";
 					}
 
-				},false)
+				},false);
 
 				//背景音乐开关
 				self.paused = false;
-				musicBtn.addEventListener("click",function(){
+				
+				addEventListener(musicBtn$,"click",function(){
 					if(!self.paused){
-						musicBtn.src = "images/sound-off.png";
-						audio.pause();
+						musicBtn$.src = "images/sound-off.png";
+						audio$.pause();
 						self.paused = true;
 					} else {
-						musicBtn.src = "images/sound-on.png";
-						audio.play();
+						musicBtn$.src = "images/sound-on.png";
+						audio$.play();
 						self.paused = false;
 					}
 				},false);
 
-				startBtn.addEventListener("click",function(){
-						var leftTime = self.timeLimit,
-							won = $("won");
-						
-						if(self.isGameBegin){
-							return;
-						}
-						audio.play();
-						won.style.display = "none";
-						!self.imgLoad && self.loadImg();
-						if(self.imgLoad){
-							self.creatMap().disorder();
-							self.drawMap();
-							t = setInterval(function(){
-									//--leftTime;
-									var posX = --leftTime;
+				addEventListener(startBtn$,"click",function(){
+					var leftTime = self.timeLimit,
+						won$ = $("won");
+					
+					if(self.isGameBegin){
+						return;
+					}
+					audio$.play();
+					won$.style.display = "none";
+					self.creatMap().disorder();
+					self.drawMap();
+					t = setInterval(function(){
+							var posX = --leftTime;
 
-									progressFull.style.clip = "rect(0,270px,35px,"+posX+"px)";
-									progressHead.style.left = (posX-5) + "px";
-									if(leftTime === 0){
-										self.gameover();
-									}
-								},1000)
-							self.isGameBegin = true;
-							self.toggleInterface();
-						} else {
-							setTimeout(arguments.callee,30);
-						}
-					},false);
-					hintBtn.addEventListener("click",function(){
-						var hintText = $("hint_text");
+							progressFull$.style.clip = "rect(0,270px,35px,"+posX+"px)";
+							progressHead$.style.left = (posX-5) + "px";
+							if(leftTime === 0){
+								self.gameover();
+							}
+						},1000)
+					self.isGameBegin = true;
+					self.toggleInterface();
+				},false);
+					
+				addEventListener(hintBtn$,"click",function(){
+						var hintText$ = $("hint_text");
 						
 						if(!self.isGameBegin){
 								return;
@@ -572,14 +568,15 @@
 
 						if(self.hintTimes > 0){
 							self.hint();
-							/*if((--self.hintTimes) === 0){
-								hintBtn.style.cursor = "default";
-							}*/
-							hintText.innerHTML = "*"+self.hintTimes;
+							if((--self.hintTimes) === 0){
+								hintBtn$.style.cursor = "default";
+							}
+							hintText$.innerHTML = "*"+self.hintTimes;
 						}
-					},false);
-					disorderBtn.addEventListener("click",function(){
-						var disorderText = $("disorder_text");
+				},false);
+				
+				addEventListener(disorderBtn$,"click",function(){
+						var disorderText$ = $("disorder_text");
 						
 						if(!self.isGameBegin){
 							return;
@@ -588,23 +585,45 @@
 						if(self.disorderTimes > 0){
 							self.disorder().drawMap();
 							if((--self.disorderTimes) === 0){
-								disorderBtn.style.cursor = "default";
+								disorderBtn$.style.cursor = "default";
 							}
-							disorderText.innerHTML = "*"+self.disorderTimes;
+							disorderText$.innerHTML = "*"+self.disorderTimes;
 						}
-					},false);
+				},false);
 
-					document.addEventListener("click",function(e){	//上帝模式
+				addEventListener(document,"click",function(e){	//上帝模式
 						if(!self.isGameBegin){
 							return;
 						}
 						if(e.ctrlKey && e.shiftKey){
-							self.clearAll();
+							if(self.isGod){
+								alert("上帝模式关闭");
+								self.isGod = false;
+							} else {
+								alert("上帝模式开启");
+								self.isGod = true;
+							}
 						}
 
-					},false)
+				},false);
 
-					this.eventBound = true;
+				addEventListener(document,"keyup",function(e){	//调试模式
+					var	e = e || window.event;
+					if(!self.isGameBegin){
+							return;
+						}
+						console.log(e);
+						if(e.ctrlKey && e.shiftKey && e.keyCode === 76){
+							self.success();
+						}
+
+						if(e.ctrlKey && e.shiftKey && e.keyCode === 68){
+							self.gameover();
+						}
+
+				},false);
+				
+				this.eventBound = true;
 				return self;
 			},
 			autoDisorder:function(){
@@ -620,12 +639,13 @@
 				}
 			},
 			success:function(){
-				var startBtn = $("start_button"),
-					won = $("won");
+				var startBtn$ = $("start_button"),
+					won$ = $("won"),
+					records$ = $("player_records");
 
-				startBtn.style.display = "block";
-				won.src = "images/zombieNote.png";
-				won.style.display = "block";
+				startBtn$.style.display = "block";
+				won$.src = "images/zombieNote.png";
+				won$.style.display = "block";
 				this.isGameBegin = false;
 				this.ctx.clearRect(0,0,600,480);
 				this.ctx.save();
@@ -635,49 +655,81 @@
 				if(this.imgsType < 18){
 					this.imgsType++;
 				}
-				if(this.imgsType !== 0 && this.imgsType%2 === 0){
+		//		if(++(this.records)%4 === 0){
 					won.src = "images/trophy.png";
-					alert("恭喜你赢得一个奖杯！");
-				}
-
+					records$.innerHTML = ++this.records;
+					this.setCookie("records",this.records);
+		//			alert("恭喜你赢得一个奖杯！");
+		//		}
 				this.init();
 			},
 			gameover:function(){
-				var startBtn = $("start_button"),
-					won = $("won");
+				var startBtn$ = $("start_button"),
+					won$ = $("won"),
+					player$ = $("player_name"),
+					records$ = $("player_records"),
+					name;
 
-				startBtn.style.display = "block";
-				won.src = "images/zombiesWon.png";
-				won.style.display = "block";
+				startBtn$.style.display = "block";
+				won$.src = "images/zombiesWon.png";
+				won$.style.display = "block";
 				this.isGameBegin = false;
 				this.ctx.clearRect(0,0,600,480);
 				this.ctx.save();
 				this.toggleInterface();
 				clearInterval(t);
+				
+				if(this.getCookie("name") === null){
+					name = prompt("请输入您的昵称","playerA");
+					if(name.length > 6){
+						name = name.substr(0,6);
+					}
+					this.setCookie("name",name);
+					player$.innerHTML = name;
+				} 
+				this.setCookie("records",this.records);
+				records$.innerHTML = this.records;
 			},
 			toggleInterface:function(){
-				var	wrap = $("llk_wrap"),
-					progressbar = $("llk_progressbar"),
-					toolsBox = $("llk_tools"),
-					startBtn = $("start_button"),
-					progressFull = $("progress_full"),
-					progressHead = $("progress_head");
+				var	wrap$ = $("llk_wrap"),
+					progressbar$ = $("llk_progressbar"),
+					toolsBox$ = $("llk_tools"),
+					startBtn$ = $("start_button"),
+					progressFull$ = $("progress_full"),
+					progressHead$ = $("progress_head");
 
 				if(this.isGameBegin){
-					toolsBox.style.display = "block";
-					progressbar.style.display = "block";
-					startBtn.style.display = "none";
-					wrap.style.backgroundImage = "url(images/background1.jpg)";
-					wrap.style.backgroundPosition = "40% 0%";
+					toolsBox$.style.display = "block";
+					progressbar$.style.display = "block";
+					startBtn$.style.display = "none";
+					wrap$.style.backgroundImage = "url(images/background1.jpg)";
+					wrap$.style.backgroundPosition = "40% 0%";
 				} else {
-					toolsBox.style.display = "none";
-					progressbar.style.display = "none";
-					startBtn.style.display = "block";
-					wrap.style.backgroundImage = "url(images/background.jpg)";
+					toolsBox$.style.display = "none";
+					progressbar$.style.display = "none";
+					startBtn$.style.display = "block";
+					wrap$.style.backgroundImage = "url(images/background.jpg)";
 				}
 				
-				progressFull.style.clip = "rect(0,270px,35px,0px)";
-				progressHead.style.left = "245px";
+				progressFull$.style.clip = "rect(0,270px,35px,0px)";
+				progressHead$.style.left = "245px";
 
+			},
+			setCookie:function(name,value){
+				var date = new Date();
+				
+				date.setTime(date.getTime()+1*1000*3600*24*365);
+
+				document.cookie = name + "="+ escape(value) + ";expires=" + date.toGMTString() +";path=/";
+			},
+			getCookie:function(name){
+				var cookie = document.cookie,
+					regExp = new RegExp("[sS]*"+name+"=([^;]*)(;|$)"),
+					ret = cookie.match(regExp);
+
+				if(ret != null){
+					return ret[1];
+				}
+				return null;
 			}
 		}

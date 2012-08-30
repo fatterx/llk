@@ -2,15 +2,25 @@
 margin:0;
 padding:0;
 }
-
+.container{
+margin:0 auto;
+width:900px;
+height:640px;
+}
+#loading{
+width:900px;
+height:640px;
+line-height:640px;
+text-align:center;
+background:#eee;
+}
 #llk_wrap{
 background-image:url(../images/background.jpg);
 background-repeat:no-repeat;
 width:900px;
 height:640px;
-margin:0 auto;
 position:relative;
-z-index:1;
+display:none;
 }
 #llk_progressbar{
 height:40px;
@@ -90,6 +100,27 @@ top:100px;
 left:200px;
 height:400px;
 width:500px;
+}
+#player_information{
+position:absolute;
+top:10px;
+right:20px;
+height:49px;
+width:100px;
+background:url(../images/recordsBackground.png) no-repeat;
+text-align:center;
+line-height:49px;
+color:#fefe00;
+font-size:12px;
+}
+
+#player_information #player_name{
+color:#ff00ff;
+}
+#player_information #player_records{
+font-size:14px;
+font-weight:bold;
+color:#ff4444;
 }
 .clear{
 clear:both;
