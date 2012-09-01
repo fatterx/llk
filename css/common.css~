@@ -58,8 +58,8 @@ left:245px;
 width:600px;
 height:480px;
 position:relative;
-top:40px;
-left:0px;
+top:100px;
+left:60px;
 }
 #llk_map canvas{
 position:relative;
