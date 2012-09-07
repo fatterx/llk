@@ -4,17 +4,6 @@
 		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 		<title>植物大战僵尸--连连看</title>
 		<link href="css/common.css" type="text/css" rel="stylesheet">
-		<script type="text/javascript">
-  			var _gaq = _gaq || [];
- 			_gaq.push(['_setAccount', 'UA-34508528-1']);
-			_gaq.push(['_trackPageview']);
-
-			(function() {
-				var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-			})();
-		</script>
 	</head>
 	<body>
 		<div class="container">
@@ -22,30 +11,30 @@
 			<div id="llk_wrap">
 				<audio src="images/bg.ogg" preload="preload" loop="loop" id="music"></audio>
 				<div id="llk_map">
-					<canvas width="720" height="600" id="canvas">Oops! Your Browser Cannot Support HTML5!</canvas>
+					<canvas width="720" height="600" id="canvas">Oops! Your Browser Doesnt Support HTML5!</canvas>
 				</div>
 				<div id="llk_tools">
 					<div class="tools-item">
 						<span>提示:</span>
-						<img alt="hint" src="images/hint.png" id="hint_button"/>
+						<span id="hint_button" class="img-button" title="提示"></span>
 						<span id="hint_text">*3</span>
 					</div>
 					<div class="tools-item">
 						<span>重排:</span>
-						<img alt="disorder" src="images/disorder.png" id="disorder_button"/>
+						<span id="disorder_button" class="img-button" title="重排"></span>
 						<span id="disorder_text">*3</span>
 					</div>
 					<div class="tools-item">
 						<span>音乐:</span>
-						<img alt="music" src="images/sound-on.png" id="music_button"/>
+						<span id="music_button" class="img-button" title="音乐"></span>
 					</div>
 				</div>
-				<img alt="开始" src="images/start.png" id="start_button"/>
+				<div id="start_button" class="img-button" title="开始游戏"><span >开始游戏</span></div>
 				<div id="llk_progressbar">
 					<div id="progress_content">
-						<img id="progress_empty" src="images/FlagMeterEmpty.png"/>
-						<img id="progress_full" src="images/FlagMeterFull.png" />
-						<img id="progress_head" src="images/FlagMeterParts1.png"/>
+						<span id="progress_empty" class="img-button"></span>
+						<span id="progress_full"  class="img-button"></span>
+						<span id="progress_head" class="img-button"></span>
 					</div>
 				</div>
 				<img src="images/zombiesWon.png" id="won"/>
@@ -55,7 +44,7 @@
 				</div>
 			</div>
 			<div id="dialog">
-				<div id="dialog_head">请先输入您的昵称</div>
+				<div id="dialog_head">请输您的昵称</div>
 				<div id="dialog_body">
 					<label for="name_text" >昵称：</label>
 					<input type="text" maxLength="6" value="player" id="name_text"/>

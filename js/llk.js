@@ -43,7 +43,7 @@
 
 		LLK.prototype = {
 			loading:function(){
-				var	imgQueue = ['pvz.png','background.jpg','background1.jpg','toolsBackground.png','zombieNote.png','zombiesWon.png','recordsBackground.png','trophy.png'];
+				var	imgQueue = ['toolsBackground.png','trophy.png','zombieNote.png','zombiesWon.png','buttons.png','pvz.png','background.jpg','background1.jpg'];
 					this.loadImg(imgQueue);
 					this.checkLoaded();
 			},
@@ -537,11 +537,11 @@
 				
 				addEventListener(musicBtn$,"click",function(){
 					if(!self.paused){
-						musicBtn$.src = "images/sound-off.png";
+						musicBtn$.style.backgroundPosition = "-105px -69px";
 						audio$.pause();
 						self.paused = true;
 					} else {
-						musicBtn$.src = "images/sound-on.png";
+						musicBtn$.style.backgroundPosition = "-69px -70px";
 						audio$.play();
 						self.paused = false;
 					}
@@ -611,7 +611,7 @@
 				addEventListener(submitBtn$,"click",function(){
 					var name = $("name_text").value,
 						player$ = $("player_name"),
-						dialog = $("dialog"),
+						dialog$ = $("dialog"),
 						mask$ = $("mask");
 
 					if(name.length > 6){
@@ -619,8 +619,8 @@
 					}
 					self.setCookie("name",name);
 					player$.innerHTML = name;
-					dialog.style.display = "none";
-					mask.style.display = "none";
+					dialog$.style.display = "none";
+					mask$.style.display = "none";
 				});
 
 				addEventListener(document,"click",function(e){	//上帝模式

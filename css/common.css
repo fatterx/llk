@@ -17,6 +17,7 @@ width:900px;
 height:640px;
 position:relative;
 }
+/* loading */
 #loading{
 width:900px;
 height:640px;
@@ -24,6 +25,7 @@ line-height:640px;
 text-align:center;
 background:#eee;
 }
+/* wrap */
 #llk_wrap{
 background-image:url(../images/background.jpg);
 background-repeat:no-repeat;
@@ -31,28 +33,6 @@ width:900px;
 height:640px;
 position:relative;
 display:none;
-}
-#llk_progressbar{
-height:40px;
-width:250px;
-display:none;
-position:absolute;
-right:60px;
-bottom:5px;
-}
-#progress_content{
-position:relative;
-}
-#progress_content img{
-position:absolute;
-top:0;
-}
-
-#progress_full{
-clip:rect(0,0,0,0);
-}
-#progress_head{
-left:245px;
 }
 #llk_map{
 width:600px;
@@ -63,12 +43,6 @@ left:0px;
 }
 #llk_map canvas{
 position:relative;
-}
-#llk_map img{
-width:60px;
-height:60px;
-float:left;
-cursor:pointer;
 }
 #llk_tools{
 display:none;
@@ -86,23 +60,84 @@ font-size:20px;
 font-weight:bold;
 margin:20px;
 }
-#llk_tools span{
-line-height:20px;
-}
-#llk_tools img{
-width:40px;
+/* progressbar */
+#llk_progressbar{
 height:40px;
-cursor:pointer;
-vertical-align:middle;
+width:250px;
+display:none;
+position:absolute;
+right:60px;
+bottom:5px;
+}
+
+/*  buttons */
+.img-button{
+background-image:url(../images/buttons.png);
+background-attachment:scroll;
 }
 #start_button{
 position:absolute;
-width:300px;
-height:80px;
+width:332px;
+height:94px;
 left:300px;
 bottom:40px;
 cursor:pointer;
+background-position:0px -105px;
 }
+#start_button span{
+display:none;
+height:80px;
+line-height:80px;
+font-size:30px;
+color:yellow;
+text-align:center;
+}
+
+/* tools button */
+#llk_tools span{
+line-height:20px;
+}
+span.img-button{
+width:32px;
+height:32px;
+cursor:pointer;
+vertical-align:middle;
+display:inline-block;
+}
+#disorder_button{
+background-position:0px -69px;
+}
+#hint_button{
+background-position:-33px -70px;
+}
+#music_button{
+background-position:-69px -70px;
+}
+
+/* progress img */
+#progress_content{
+position:relative;
+}
+#progress_content span{
+position:absolute;
+top:0;
+width:270px;
+height:35px;
+cursor:default;
+}
+#progress_empty{
+background-position:0 0;
+}
+#progress_full{
+clip:rect(0,0,0,0);
+background-position:0 -36px;
+}
+#progress_content #progress_head{
+left:245px;
+width:35px;
+background-position:-135px -70px;
+}
+
 #won{
 position:absolute;
 display:none;
@@ -117,7 +152,8 @@ top:10px;
 right:20px;
 height:49px;
 width:100px;
-background:url(../images/recordsBackground.png) no-repeat;
+background:url(../images/buttons.png) no-repeat;
+background-position:0 -200px;
 text-align:center;
 line-height:49px;
 color:#fefe00;
