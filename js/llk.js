@@ -8,6 +8,7 @@
  *	2012.8.30 15:00 增加了cookie操作，用来保存用户记录
  *	2012.8.30 10:00 增加了资源加载界面
  *	2012.9.1  10:00 修改了地图连接规则
+ *	2012.9.10 10:30 增加图片加载超时处理
  */
 
 		var $ = function(id){
@@ -81,7 +82,8 @@
 				var img = new Image(),
 					self = this,
 					percentage$ = $("percentage"),
-					src, percentage;
+					src, percentage,
+					tryTime = 1;
 		
 				if(queue.length > 0){
 					src = queue.shift();
@@ -97,6 +99,19 @@
 						} else {
 							self.isLoaded = true;
 							return true;
+						}
+					}
+					img.onerror = function(){
+						if(tryTime < 3){
+							img.src = "images/"+src;
+							tryTime++;
+						} else {
+							if(queue.length > 0){
+								self.loadImg(queue);
+							} else {
+								self.isLoaded = true;
+								return true;
+							}
 						}
 					}
 				}
